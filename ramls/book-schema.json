@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-03/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "views":  {
+      "type": "integer"
+    },
+    "authours": {
+      "type": "array",
+      "item_type": "object",
+      "uniqueItems": true,
+      "minItems": 1
+    }
+  }
+}
