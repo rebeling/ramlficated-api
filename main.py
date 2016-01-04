@@ -25,7 +25,7 @@ def flaskify_ramlfication(api):
 
 if __name__ == "__main__":
 
-    raml_file = 'ramls/books.raml'
+    raml_file = 'ramls/articles-api.raml'
     api = ramlfications.parse(raml_file)
     print api.title
 

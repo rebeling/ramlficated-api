@@ -46,7 +46,7 @@ class RamlowView(View):
                 doc = self._message(responses, code, doc)
 
         # create response object
-        resp = jsonify(doc)
+        resp = jsonify(results=doc) if isinstance(doc, list) else jsonify(doc)
         resp.status_code = code
         resp.headers['Link'] = self.base_url
         return resp
@@ -62,12 +62,17 @@ class RamlowView(View):
             responses = resource.responses
 
             if request_method == 'POST':
-                # Retrieve a document, validate and send to db.
+                # Retrieve a document or documents, validate and send to db.
 
-                doc = json.loads(request.data)
-                validate(doc, resource.body[0].schema)
-                success = self.db_api.add(doc)
-                return self._response(success, doc, responses)
+                data = json.loads(request.data)
+
+                docs = data if isinstance(data, list) else [data]
+                schema = resource.body[0].schema
+                for obj in docs:
+                    validate(obj, schema)
+
+                success = self.db_api.add(docs)
+                return self._response(success, data, responses)
 
             else:
                 id = self._get_id(resource, kwargs)
@@ -77,8 +82,7 @@ class RamlowView(View):
                     return self._response(success, doc, responses)
 
                 elif request_method == 'PUT':
-                    data = json.loads(request.data)
-                    success = self.db_api.update(id, data)
+                    success = self.db_api.update(id, json.loads(request.data))
                     return self._response(success, None, responses)
 
                 elif request_method == 'DELETE':

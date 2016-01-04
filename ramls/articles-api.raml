@@ -1,0 +1,70 @@
+#%RAML 0.8
+---
+title: CRUD
+version: 1.0
+baseUri: http://localhost:5000/api/{version}
+
+
+/articles:
+  displayName: Articles CRUD
+  get:
+    description: Retrieve article-related informations.
+    queryParameters:
+      title:
+        description: "The title of a article to search (it is case insensitive and doesn't need to match the whole title)"
+        required: true
+        minLength: 3
+        type: string
+        example: "Get L"
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include ../data/article-examples.json
+  post:
+    description: Add a article to database.
+    body:
+      application/json:
+        schema: !include ../data/article-schema.json
+        example: !include ../data/article-example.json
+    responses:
+      201:
+        description: article has been successfully created.
+      409:
+        description: article already exists.
+
+  /{id}:
+    displayName: article
+    uriParameters:
+      id:
+        description: |
+          article Identifier
+        required: true
+    get:
+      description: Retrieve article-related information.
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include ../data/article-example.json
+        404:
+          description: Unable to find article with that identifier.
+    put:
+      description: Update article information.
+      body:
+        application/json:
+          example: !include ../data/article-partial-example.json
+      responses:
+        204:
+          description: |
+            The article has been successfully updated.
+        404:
+          description: Unable to find article with that identifier.
+    delete:
+      description: Remove article from the catalog.
+      responses:
+        204:
+          description: |
+            The article has been successfully removed.
+        404:
+          description: Unable to find article with that identifier.

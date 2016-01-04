@@ -1,19 +1,21 @@
 .PHONY: docs
 
 docs:
-	raml2html ramls/books.raml -o docs/books.html
-	open docs/books.html
+	raml2html ramls/articles-api.raml -o docs/articles-api.html
+	open docs/articles-api.html
 
 calls:
-	http post :5000/books title="Angel & Demons" authors:='["Dan Brown"]' id="1" views:=0
-	http post :5000/books title="The Da Vinci Code" authors:='["Dan Brown"]' id="2" views:=0
-	http post :5000/books authors:='["title missing but required"]' id="3"
-	http :5000/books/1 -v
-	http put :5000/books/1 script="ctx._source.views+=1"
-	http put :5000/books/1 doc:='{"title": "Demons"}'
-	http :5000/books/1 -v
-	http delete :5000/books/2 -v
-	# http delete :5000/books/1 -v
+	http post :5000/articles < data/article-example.json
+	http post :5000/articles < data/article-examples.json
+	http post :5000/articles id="42" note="500 on validation, missing fields"
+	http :5000/articles/1 -v
+	http put :5000/articles/1 script="ctx._source.views+=1"
+	http put :5000/articles/1 doc:='{"title": "Demons"}'
+	http :5000/articles/1 -v
+	http delete :5000/articles/1 -v
+	http delete :5000/articles/2 -v
+	http delete :5000/articles/3 -v
+	http delete :5000/articles/4 -v
 
 tree:
-	ramlfications tree books.raml -v
+	ramlfications tree articles.raml -v

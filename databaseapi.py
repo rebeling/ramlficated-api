@@ -17,19 +17,31 @@ class DatabaseAPI(object):
     def __init__(self):
         super(DatabaseAPI, self).__init__()
         self.es = ElasticSearch()
-        self.index = 'myindex'
-        self.doc_type = 'book'
+        self.index = 'raml_api_index'
+        self.doc_type = 'document'
 
     def _resolve(self, index, doc_type):
         index = index if index else self.index
         doc_type = doc_type if doc_type else self.doc_type
         return index, doc_type
 
-    def add(self, doc, index=None, doc_type=None):
-        """POST case: add new document."""
+    def add(self, docs, index=None, doc_type=None, overwrite_existing=False):
+        """POST case: add new document or bulk of documents."""
         index, doc_type = self._resolve(index, doc_type)
-        res = self.es.index(index, doc_type, doc, id=doc.get("id"))
-        success = True if res['created'] else False
+
+        bulk = []
+        for doc in docs:
+            bulk.append(self.es.index_op(doc,
+                                         doc_type=doc_type,
+                                         overwrite_existing=overwrite_existing,
+                                         **{"id": doc.get("id")}))
+        res = self.es.bulk(bulk,
+                           doc_type=doc_type,
+                           index=index)
+
+        print res
+
+        success = True if res['errors'] is False else False
         return success
 
     def get_documents(self, query=None):
@@ -56,9 +68,7 @@ class DatabaseAPI(object):
         index, doc_type = self._resolve(index, doc_type)
 
         try:
-            print "data", data
             res = self.es.update(index, doc_type, id, **data)
-            print res
             success = True
         except ElasticHttpNotFoundError:
             success = False

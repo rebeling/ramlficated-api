@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-03/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "teaser": {
+      "type": "string",
+      "required": true
+    },
+    "section": {
+      "type": "string",
+      "required": true
+    },
+    "date": {
+      "type": "string",
+      "required": true,
+      "pattern": "\\d{1,4}-\\d{1,2}-\\d{1,2}T\\d{2}:\\d{2}:\\d{2}Z"
+    },
+    "link":  {
+      "type": "string",
+      "required": true
+    },
+    "views":  {
+      "type": "integer"
+    },
+    "authours": {
+      "type": "array",
+      "item_type": "object",
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "media": {
+      "type": "array",
+      "item_type": "object",
+      "uniqueItems": true,
+      "minItems": 1
+    }
+  }
+}
