@@ -1,24 +1,11 @@
 # -*- coding: utf-8 -*-
 from flask import request
 from flask.views import View
-from jsonschema import validate
 import json
 from databaseapi import DatabaseAPI
 from flask import jsonify
-
-
-def example(responses, code=None, key='description'):
-    # print resource_responses
-    example = None
-    print responses
-    for res in responses:
-        print res
-        if code:
-            if code == res.code:
-                print ">>", res.raw
-                example = res.raw[code][key]
-    print example
-    return example
+from utils import post_validator
+from utils import response_info
 
 
 class RamlowView(View):
@@ -29,21 +16,9 @@ class RamlowView(View):
         self.db_api = DatabaseAPI()
         self.base_url = api.base_uri
 
-    def _message(self, responses, code, doc):
-        doc = example(responses, code=code)
-        return {'status': code, 'message': '{} {}'.format(doc, request.url)}
-
     def _response(self, success, doc, responses, code=None):
 
-        if code == 500:
-            doc = {'status': 500,
-                   'message': '{} {}'.format(doc, request.url)}
-        else:
-            first = '2' if success else '4'
-            x = [x for x in responses if repr(x.code).startswith(first)][0]
-            code = x.code
-            if doc is None or first == '4':
-                doc = self._message(responses, code, doc)
+        doc, code = response_info(success, doc, responses, code=code, request_url=request.url)
 
         # create response object
         resp = jsonify(results=doc) if isinstance(doc, list) else jsonify(doc)
@@ -59,37 +34,32 @@ class RamlowView(View):
         try:
             request_method = request.method
             resource = self.resources[request_method]
-            responses = resource.responses
 
             if request_method == 'POST':
                 # Retrieve a document or documents, validate and send to db.
 
                 data = json.loads(request.data)
-
-                docs = data if isinstance(data, list) else [data]
-                schema = resource.body[0].schema
-                for obj in docs:
-                    validate(obj, schema)
+                docs = post_validator(data, resource.body[0].schema)
 
                 success = self.db_api.add(docs)
-                return self._response(success, data, responses)
+                return self._response(success, data, resource.responses)
 
             else:
                 id = self._get_id(resource, kwargs)
 
                 if request_method == 'GET':
                     success, doc = self.db_api.get(id)
-                    return self._response(success, doc, responses)
+                    return self._response(success, doc, resource.responses)
 
                 elif request_method == 'PUT':
                     success = self.db_api.update(id, json.loads(request.data))
-                    return self._response(success, None, responses)
+                    return self._response(success, None, resource.responses)
 
                 elif request_method == 'DELETE':
                     success = self.db_api.delete(id)
-                    return self._response(success, None, responses)
+                    return self._response(success, None, resource.responses)
 
             raise NotImplementedError
 
         except Exception, e:
-            return self._response(False, e, responses, code=500)
+            return self._response(False, e, resource.responses, code=500)
