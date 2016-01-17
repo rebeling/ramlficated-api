@@ -1,2 +1,8 @@
 *.pyc
-logs
+
+logs/app.log
+docs/*.md
+docs/*.html
+
+env
+*.egg-info
