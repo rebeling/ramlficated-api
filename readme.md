@@ -20,6 +20,12 @@ package.
     make flask-calls
 
 
+Documentation
+--------------
+
+Check out the api docu created with *raml2html* (https://www.npmjs.com/package/raml2html)
+served from this repo: https://rawgit.com/rebeling/ramlficated-api/master/docs/documents-api.html
+
 
 Todos:
 -----
