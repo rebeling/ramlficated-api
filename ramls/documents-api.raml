@@ -1,0 +1,137 @@
+#%RAML 0.8
+---
+title: CRUD
+version: 1.0
+baseUri: http://localhost:5000/api/{version}
+
+documentation:
+  - title: Welcome
+    content: |
+      Welcome to the api documentation. Clone code [example.com](https://www.example.com).
+
+      ```python
+      raml2html = require('raml2html')
+
+      # source can either be a filename, file contents (string) or parsed RAML object
+      raml2html.parse(source, onSuccess, onError)
+
+      # Using your own templates:
+      # - config should be an object with at least an `template` property
+      raml2html.parseWithConfig(source, config, onSuccess, onError)
+      ```
+
+  - title: Deployment
+    content: |
+      It is no magic, just ...
+
+      make
+
+  - title: Documentation
+    content: |
+      The npm module raml2html parse this raml-file and creates an html version of your api configuration.
+      I am not satisfied with the md-version, but html rocks ;)
+
+      Done
+
+
+securitySchemes:
+  - Unauthenticated: !include unauthenticated.raml
+  - oauth_1_0:
+      description: OAuth 1.0 continues to be supported for all API requests, but OAuth 2.0 is now preferred.
+      type: OAuth 1.0
+      settings:
+        requestTokenUri: https://api.dropbox.com/1/oauth/request_token
+        authorizationUri: https://www.dropbox.com/1/oauth/authorize
+        tokenCredentialsUri: https://api.dropbox.com/1/oauth/access_token
+
+
+traits:
+  - searchable:
+      queryParameters:
+        q:
+          description: Search query term. Search is performed on the document body and title.
+          type: string
+          minLength: 3
+          default: "*:*"
+        sort:
+          description: Search results are sorted by their relevance to the query term (q). Use the sort parameter to sort by date.
+          type: string
+          default: relevance
+        page:
+          description: The page to return
+          type: number
+          default: 0
+        page_size:
+          description: The number of items per page
+          type: number
+          default: 10
+      headers:
+        TESTING:
+          type: string
+          description: does a trait render its headers?
+
+
+/topsecrets:
+  securedBy: [Unauthenticated]
+  get:
+    is: [searchable]
+    description: Get the top secrets.
+
+
+/documents:
+  displayName: Documents CRUD
+  get:
+    description: Search for specific documents.
+    is: [searchable]
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include data/document-examples.json
+  post:
+    description: Add document(s) to database.
+    body:
+      application/json:
+        schema: !include data/document-schema.json
+        example: !include data/document-examples.json
+    responses:
+      201:
+        description: document(s) has been successfully created.
+      409:
+        description: document already exists.
+
+  /{id}:
+    displayName: document
+    uriParameters:
+      id:
+        description: |
+          document Identifier
+        required: true
+    get:
+      description: Retrieve document-related information.
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include data/document-example.json
+        404:
+          description: Unable to find document with that identifier.
+    put:
+      description: Update document information.
+      body:
+        application/json:
+          example: !include data/document-partial-example.json
+      responses:
+        204:
+          description: |
+            The document has been successfully updated.
+        404:
+          description: Unable to find document with that identifier.
+    delete:
+      description: Remove document from the catalog.
+      responses:
+        204:
+          description: |
+            The document has been successfully removed.
+        404:
+          description: Unable to find document with that identifier.

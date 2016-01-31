@@ -21,7 +21,7 @@ def flaskify_ramlfication(api):
 
 # if __name__ == "__main__":
 
-#     raml_file = 'ramls/articles-api.raml'
+#     raml_file = 'ramls/documents-api.raml'
 #     api = ramlfications.parse(raml_file)
 #     print api.title
 
@@ -46,7 +46,7 @@ def flaskify_ramlfication(api):
 def make_app():
 
     # 1. collect all methods for same endpoint pattern
-    raml_file = 'ramls/articles-api.raml'
+    raml_file = 'ramls/documents-api.raml'
     api = ramlfications.parse(raml_file)
     flask_resources = flaskify_ramlfication(api)
 

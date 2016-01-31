@@ -22,39 +22,44 @@ install-requirements: virtualenv
 
 
 docs:
-	raml2html ramls/articles-api.raml -o docs/articles-api.html
-	raml2md ramls/articles-api.raml -o docs/articles-api.md
-	open docs/articles-api.html && open docs/articles-api.md
+	raml2html ramls/documents-api.raml -o docs/documents-api.html
+	raml2md ramls/documents-api.raml -o docs/documents-api.md
+	open docs/documents-api.html && open docs/documents-api.md
 
-calls:
-	http post :5000/articles < data/article-example.json
-	http post :5000/articles < data/article-examples.json
-	http post :5000/articles id="42" note="500 on validation, missing fields"
-	http :5000/articles/1 -v
-	http put :5000/articles/1 script="ctx._source.views+=1"
-	http put :5000/articles/1 doc:='{"title": "Demons"}'
-	http :5000/articles/1 -v
-	http delete :5000/articles/1 -v
-	http delete :5000/articles/2 -v
-	http delete :5000/articles/3 -v
-	http delete :5000/articles/4 -v
+run-flask:
+	env/bin/python ramlficated-api/main-flask.py
+
+flask-calls:
+	http post :5000/documents < data/document-example.json
+	http post :5000/documents < data/document-examples.json
+	http post :5000/documents id="42" note="500 on validation, missing fields"
+	http :5000/documents/1 -v
+	http put :5000/documents/1 script="ctx._source.views+=1"
+	http put :5000/documents/1 doc:='{"title": "Demons"}'
+	http :5000/documents/1 -v
+	http delete :5000/documents/1 -v
+	http delete :5000/documents/2 -v
+	http delete :5000/documents/3 -v
+	http delete :5000/documents/4 -v
+
+run-tornado:
+	env/bin/python ramlficated-api/main-tornado.py
 
 tornado-calls:
-	http post :8888/articles < data/article-example.json
-	http post :8888/articles < data/article-examples.json
-	http post :8888/articles id="42" note="500 on validation, missing fields"
-	http :8888/articles/1 -v
-	http put :8888/articles/1 script="ctx._source.views+=1"
-	http put :8888/articles/1 doc:='{"title": "Demons"}'
-	http :8888/articles/1 -v
-	http delete :8888/articles/1 -v
-	http delete :8888/articles/2 -v
-	http delete :8888/articles/3 -v
-	http delete :8888/articles/4 -v
+	http post :8888/documents < data/document-example.json
+	http post :8888/documents < data/document-examples.json
+	http post :8888/documents id="42" note="500 on validation, missing fields"
+	http :8888/documents/1 -v
+	http put :8888/documents/1 script="ctx._source.views+=1"
+	http put :8888/documents/1 doc:='{"title": "Demons"}'
+	http :8888/documents/1 -v
+	http delete :8888/documents/1 -v
+	http delete :8888/documents/2 -v
+	http delete :8888/documents/3 -v
+	http delete :8888/documents/4 -v
 
 tree:
-	ramlfications tree articles.raml -v
-
+	ramlfications tree documents.raml -v
 
 clean:
 	rm -fv .DS_Store .coverage

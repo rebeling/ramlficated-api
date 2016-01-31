@@ -14,6 +14,9 @@
       "type": "string",
       "required": true
     },
+    "text": {
+      "type": "string"
+    },
     "section": {
       "type": "string",
       "required": true
