@@ -1,4 +1,6 @@
 jsonschema==2.4.0
+pyelasticsearch==1.4
+pytest==2.8.7
+PyYAML==3.11
 ramlfications==0.1.8
 tornado==4.3
-pyelasticsearch==1.4

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+import json
+from flask import jsonify
 from flask import request
 from flask.views import View
-import json
+from utils.responses import response_info
+from utils.validator import post_validator
 from databaseapi import DatabaseAPI
-from flask import jsonify
-from utils import post_validator
-from utils import response_info
 
 
 class RamlowView(View):

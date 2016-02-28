@@ -1,0 +1,10 @@
+name: ramlficated_api
+version: 0.0.1
+author: matthias rebel
+
+# optional
+author_email: webmaster@rebeling.net
+url: https://github.com/rebeling/ramlficated-api
+description: "" # better use the readme
+license: Apache License
+copyright: 2015

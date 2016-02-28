@@ -1,22 +1,4 @@
 # -*- coding: utf-8 -*-
-from jsonschema import validate
-
-
-def doc_strings(app):
-
-    func_list = {}
-    for rule in app.url_map.iter_rules():
-        if rule.endpoint != 'static':
-            func_list[rule.rule] = app.view_functions[rule.endpoint].__doc__
-
-    return func_list
-
-
-def post_validator(data, schema):
-    docs = data if isinstance(data, list) else [data]
-    for obj in docs:
-        validate(obj, schema)
-    return docs
 
 
 def example(responses, code=None, key='description'):

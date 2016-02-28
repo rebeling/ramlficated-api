@@ -2,7 +2,7 @@
 from setuptools import setup
 import yaml
 
-config = yaml.load(open('etc/conf.yaml', 'r').read())
+config = yaml.load(open('etc/conf.yml', 'r').read())
 
 
 setup(

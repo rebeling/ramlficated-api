@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-# import tornado.ioloop
 import tornado.web
 import json
 from databaseapi import DatabaseAPI
-from utils import post_validator
-from utils import response_info
+from utils.responses import response_info
+from utils.validator import post_validator
 
 
 class RamlowView(tornado.web.RequestHandler):
