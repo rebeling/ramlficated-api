@@ -69,13 +69,13 @@ traits:
       200:
         body:
           application/json:
-            example: !include data/document-examples.json
+            example: !include data/document_examples.json
   post:
     description: Add document(s) to database.
     body:
       application/json:
-        schema: !include data/document-schema.json
-        example: !include data/document-examples.json
+        schema: !include data/document_schema.json
+        example: !include data/document_examples.json
     responses:
       201:
         description: document(s) has been successfully created.
@@ -95,14 +95,14 @@ traits:
         200:
           body:
             application/json:
-              example: !include data/document-example.json
+              example: !include data/document_example.json
         404:
           description: Unable to find document with that identifier.
     put:
       description: Update document information.
       body:
         application/json:
-          example: !include data/document-partial-example.json
+          example: !include data/document_partial_example.json
       responses:
         204:
           description: |

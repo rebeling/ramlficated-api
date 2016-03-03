@@ -1,10 +1,10 @@
 *.pyc
 
-logs/app.log
 docs/*.md
 
 env
 *.egg-info
 
 .cache
+.coverage
 **/__pycache__
