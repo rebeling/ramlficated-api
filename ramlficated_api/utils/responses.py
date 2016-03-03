@@ -4,14 +4,14 @@
 def example(responses, code=None, key='description'):
     # print resource_responses
     example = None
-    print responses
+    # print responses
     for res in responses:
-        print res
+        # print res
         if code:
             if code == res.code:
-                print ">>", res.raw
+                # print ">>", res.raw
                 example = res.raw[code][key]
-    print example
+    # print example
     return example
 
 
