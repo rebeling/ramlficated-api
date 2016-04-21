@@ -1,44 +1,71 @@
-.PHONY: tests docs clean all prod virtualenv install install-requirements
+.PHONY: setup virtualenv install ci unittest docs clean
 
-VIRTUALENV_DIR=${PWD}/env
-PIP=${VIRTUALENV_DIR}/bin/pip
-PYTHON=${VIRTUALENV_DIR}/bin/python
-APP_PATH=${PWD}
+VIRTUALENV_DIR = ${PWD}/env
+PIP = ${VIRTUALENV_DIR}/bin/pip
 RAML = etc/ramls
+APP = ramlficated_api
 
-# the `all` target will install everything necessary to develop and deploy
-all: prod
+help:
+	@echo '    setup ........ sets up project'
+	@echo '    docs ......... creates docs from etc/ramls file'
+	@echo '    unittest ..... runs unittest'
+	@echo '    ci ........... sets up project and run all tests'
+	@echo '    clean ........ cleans project'
+	@echo '    release ...... releases project to pypi'
 
-# the `prod` target will create the runnable distribution without tests
-prod: virtualenv install
+
+# the `setup` target will create the runnable distribution without tests
+setup: virtualenv install
 
 virtualenv:
-	if [ ! -e ${VIRTUALENV_DIR}/bin/pip ]; then virtualenv ${VIRTUALENV_DIR} --no-site-packages; fi
+	if [ ! -e ${PIP} ]; then virtualenv ${VIRTUALENV_DIR} --no-site-packages; fi
 
 install: virtualenv
 	${PIP} install -r requirements.txt
-	${PYTHON} setup.py develop
+	${VIRTUALENV_DIR}/bin/python setup.py develop
 
 # set up testing targets and a ci target for continuous integration
-ci: utests itest
+ci: unittest
 
-utests:
-	${VIRTUALENV_DIR}/bin/py.test ${APP_PATH}/tests/u-tests --verbose
 
-itests:
-	${VIRTUALENV_DIR}/bin/py.test ${APP_PATH}/tests/i-tests
+# Testing
 
-# create documentation out of the raml file
+COVERAGE_RUN=${VIRTUALENV_DIR}/bin/coverage run
+
+unittest: unittest_flask unittest_tornado
+	${COVERAGE_RUN} --source ${APP}/utils -m py.test -s tests/unit_utils/app_utils_test.py
+	coverage report -m
+
+FLASKSOURCES=${APP}/flask_main.py,${APP}/flask_view.py
+
+unittest_flask:
+	${COVERAGE_RUN} --source ${FLASKSOURCES} -m unittest discover -s tests/unit_flask -p '*_test.py'
+	coverage report -m
+
+# /tornado_main.py,${APP}/tornado_view.py
+TORNADOSOURCES=${APP}
+
+unittest_tornado:
+	${COVERAGE_RUN} --source ${TORNADOSOURCES} -m tornado.testing discover -s tests/unit_tornado -p '*_test.py'
+	coverage report -m
+
+integrationtest:
+	${VIRTUALENV_DIR}/bin/python tests/integration/db_health.py
+	${COVERAGE_RUN} --source ${APP} -m unittest discover -s tests/integration -p '*_test.py'
+
+
+# Documentation via raml file
 docs:
-	# npm install raml2html raml2md
-	raml2html ${RAML}/documents-api.raml -o docs/documents-api.html
-	raml2md ${RAML}/documents-api.raml -o docs/documents-api.md
-	open docs/documents-api.html && open docs/documents-api.md
+	npm set progress=false
+	npm install raml2html raml2md
+	raml2html ${RAML}/documents_api.raml -o docs/documents_api.html
+	raml2md ${RAML}/documents_api.raml -o docs/documents_api.md
+	open docs/documents_api.html && open docs/documents_api.md
 
 
 # run application and simulate calls
 run-flask:
-	${VIRTUALENV_DIR}/bin/python ramlficated_api/main_flask.py
+	${VIRTUALENV_DIR}/bin/python ramlficated_api/flask_main.py
 
 flask-calls:
 	http post :5000/documents < ${RAML}/data/document-example.json
@@ -54,7 +81,7 @@ flask-calls:
 	http delete :5000/documents/4 -v
 
 run-tornado:
-	env/bin/python ramlficated_api/main_tornado.py
+	env/bin/python ramlficated_api/tornado_main.py
 
 tornado-calls:
 	http post :8888/documents < ${RAML}/data/document-example.json
@@ -72,11 +99,14 @@ tornado-calls:
 tree:
 	ramlfications tree documents.raml -v
 
-# clean up everything
+# Clean up everything
 clean:
 	rm -fv .DS_Store .coverage
 	rm -rfv .cache
-	find ${APP_PATH} -name '*.pyc' -exec rm -fv {} \;
-	find ${APP_PATH} -name '*.pyo' -exec rm -fv {} \;
+	find ${APP} -name '*.pyc' -exec rm -fv {} \;
+	find ${APP} -name '*.pyo' -exec rm -fv {} \;
 	rm -Rf *.egg-info logs/*.log docs/*.html docs/*.md
 	rm -Rf env tests/**/__pycache__ node_modules
+
+release:
+	python setup.py sdist register upload
