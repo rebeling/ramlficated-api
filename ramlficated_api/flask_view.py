@@ -14,9 +14,12 @@ class RamlowView(views.View):
         self.base_url = api.base_uri
 
     def _response(self, success, doc, responses, code=None):
-        """Create response object."""
-        doc, code = response_info(success, doc, responses,
-                                  code=code, request_url=request.url)
+        """Preapare response and return."""
+        doc, code = response_info(success,
+                                  doc,
+                                  responses,
+                                  code=code,
+                                  request_url=request.url)
         resp = jsonify(results=doc) if isinstance(doc, list) else jsonify(doc)
         resp.status_code = code
         resp.headers['Link'] = self.base_url

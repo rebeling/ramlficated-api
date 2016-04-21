@@ -1,44 +1,27 @@
 # -*- coding: utf-8 -*-
 import tornado.web
 import json
-from databaseapi import DatabaseAPI
+
+from database_api import DatabaseAPI
 from utils.responses import response_info
 from utils.validator import post_validator
 
 
 class RamlowView(tornado.web.RequestHandler):
 
-    def initialize(self, resources, api):
-
-        self.db_api = DatabaseAPI()
-
+    def initialize(self, resources, api, config):
+        self.db_api = DatabaseAPI(config)
         self.resources = resources
         self.base_url = api.base_uri
-        print "initialize resources", resources, api
-
-    def write_error(self, status_code, **kwargs):
-        print 'In get_error_html. status_code: ', status_code
-        try:
-            # handle exception here
-            # get request and look up self.resources
-            # if status_code in [403, 404, 500, 503]:
-            error_class, message, traceback_object = kwargs["exc_info"]
-        except Exception, e:
-            message = "Woha, %s" % e
-
-        self.write('%s Error, message: %s' % (status_code, message))
-
-    def prepare(self):
-        print 'In prepare...', self.request
+        print "initialize resources ...api?", resources, api
 
     def _response(self, success, doc, responses, code=None):
-
+        """Preapare response and write back."""
         doc, code = response_info(success,
                                   doc,
                                   responses,
                                   code=code,
                                   request_url=self.request.full_url)
-                                  # request_url=self.request.uri)
 
         self.set_header('Link', self.base_url)
         self.set_header('Content-Type', 'application/json')
@@ -66,3 +49,20 @@ class RamlowView(tornado.web.RequestHandler):
         resource = self.resources['DELETE']
         success = self.db_api.delete(id)
         self._response(success, None, resource.responses)
+
+    def write_error(self, status_code, **kwargs):
+        """Catch and handle tornado error."""
+        print 'In get_error_html. status_code: ', status_code
+        try:
+            # handle exception here
+            # get request and look up self.resources
+            # if status_code in [403, 404, 500, 503]:
+            error_class, message, traceback_object = kwargs["exc_info"]
+        except Exception, e:
+            message = "Woha, %s" % e
+
+        self.write('%s Error, message: %s' % (status_code, message))
+
+    def prepare(self):
+        """Dispatch request before processed."""
+        print 'In prepare...', self.request
