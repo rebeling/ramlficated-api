@@ -24,11 +24,11 @@ Documentation
 --------------
 
 Check out the api docu created with *raml2html* (https://www.npmjs.com/package/raml2html)
-served from this repo: https://rawgit.com/rebeling/ramlficated-api/master/docs/documents-api.html
+served from this repo: https://rawgit.com/rebeling/ramlficated-api/master/docs/documents_api.html
+
 
 
 Todos:
 -----
 
-1. documentation: api doc to md
-2. research synergies: jsonschema validation - es mapping - documents
+1. research: jsonschema validation - es mapping - documents
